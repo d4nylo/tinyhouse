@@ -22,6 +22,7 @@
   },
   "scripts": {
     "start": "nodemon -r dotenv/config src/index.ts",
-    "build": "tsc --project ./"
+    "build": "tsc --project ./",
+    "seed": "ts-node temp/seed.ts"
   }
 }
