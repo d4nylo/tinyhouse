@@ -128,3 +128,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Our build folder that contains our JavaScript code compiled from TypeScript
+build/
