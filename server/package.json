@@ -2,7 +2,9 @@
   "name": "tinyhouse-v2-server",
   "version": "0.1.0",
   "dependencies": {
-    "express": "^4.17.2"
+    "apollo-server-express": "^3.6.3",
+    "express": "^4.17.2",
+    "graphql": "^16.3.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
