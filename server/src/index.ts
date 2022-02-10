@@ -17,4 +17,4 @@ server.start().then(() => {
 
 app.listen(port);
 
-console.log(`[app]: http://loacalhost:${port}`);
+console.log(`[app]: http://localhost:${port}`);
