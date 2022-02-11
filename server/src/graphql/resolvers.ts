@@ -1,21 +1,32 @@
 import { IResolvers } from "@graphql-tools/utils";
-import { listings } from "../listings";
+import { ObjectId } from "mongodb";
+import { Database, Listing } from "../lib/types";
 
 export const resolvers: IResolvers = {
   Query: {
-    listings: () => {
-      return listings;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    listings: async (_root: undefined, _args: {}, { db }: { db: Database }): Promise<Listing[]> => {
+      return await db.listings.find({}).toArray();
     },
   },
   Mutation: {
-    deleteListing: (_root: undefined, { id }: { id: string }) => {
-      for (let idx = 0; idx < listings.length; idx++) {
-        if (listings[idx].id === id) {
-          return listings.splice(idx, 1)[0];
-        }
+    deleteListing: async (
+      _root: undefined,
+      { id }: { id: string },
+      { db }: { db: Database }
+    ): Promise<Listing> => {
+      const deleteRes = await db.listings.findOneAndDelete({
+        _id: new ObjectId(id),
+      });
+
+      if (!deleteRes.value) {
+        throw new Error("failed to delete listing");
       }
 
-      throw new Error("failed to delete listing");
+      return deleteRes.value;
     },
+  },
+  Listing: {
+    id: (listing: Listing): string => listing._id.toString(),
   },
 };
