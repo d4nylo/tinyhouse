@@ -1,5 +1,5 @@
 {
-  "name": "tinyhouse-v2-server",
+  "name": "tinyhouse-server",
   "version": "0.1.0",
   "dependencies": {
     "@graphql-tools/utils": "^8.6.1",
