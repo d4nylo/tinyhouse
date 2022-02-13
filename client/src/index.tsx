@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import reportWebVitals from "./reportWebVitals";
 import { Listings } from "./sections";
+import "./styles/index.css";
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
