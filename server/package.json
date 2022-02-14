@@ -7,7 +7,7 @@
     "apollo-server-express": "^3.6.3",
     "express": "^4.17.2",
     "googleapis": "^39.2.0",
-    "graphql": "^16.3.0",
+    "graphql": "^15.8.0",
     "lodash.merge": "^4.6.2",
     "mongodb": "^4.3.1"
   },
