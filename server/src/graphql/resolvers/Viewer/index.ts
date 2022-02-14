@@ -1,17 +1,132 @@
+import crypto from "crypto";
 import { IResolvers } from "@graphql-tools/utils";
+import { Google } from "../../../lib/api";
+import { Database, User, Viewer } from "../../../lib/types";
+import { LogInArgs } from "./types";
+
+const logInViaGoogle = async (code: string, token: string, db: Database): Promise<User | null> => {
+  const { user } = await Google.logIn(code);
+
+  if (!user) {
+    throw new Error("Google login error");
+  }
+
+  // Name/Photo/Email Lists
+  const userNamesList = user.names && user.names.length ? user.names : null;
+  const userPhotosList = user.photos && user.photos.length ? user.photos : null;
+  const userEmailsList =
+    user.emailAddresses && user.emailAddresses.length ? user.emailAddresses : null;
+
+  // User Display Name
+  const userName = userNamesList ? userNamesList[0].displayName : null;
+
+  // User Id
+  const userId =
+    userNamesList && userNamesList[0].metadata && userNamesList[0].metadata.source
+      ? userNamesList[0].metadata.source.id
+      : null;
+
+  // User Avatar
+  const userAvatar = userPhotosList && userPhotosList[0].url ? userPhotosList[0].url : null;
+
+  // User Email
+  const userEmail = userEmailsList && userEmailsList[0].value ? userEmailsList[0].value : null;
+
+  // We'll first attempt to check if this user already exists in our database.
+  if (!userId || !userName || !userAvatar || !userEmail) {
+    throw new Error("Google login error");
+  }
+
+  // If the user already exists, we'll update the user information in the database to the latest information we get from Google.
+  const updateRes = await db.users.findOneAndUpdate(
+    // Mongo will select the first document where _id field matches the userId we've obtained from Google.
+    { _id: userId },
+    {
+      // Update the name, avatar, and contact fields of our document with the latest Google data.
+      $set: {
+        name: userName,
+        avatar: userAvatar,
+        contact: userEmail,
+        token,
+      },
+    },
+    // Means we want to return the updated document (not the original document) and assign the result to the updateRes constant.
+    { returnDocument: "after" }
+  );
+
+  let viewer = updateRes.value;
+
+  if (!viewer) {
+    // If we weren't able to find an already existing user, we'll want to insert and add a new user into our database.
+    const insertRes = await db.users.insertOne({
+      _id: userId,
+      token,
+      name: userName,
+      avatar: userAvatar,
+      contact: userEmail,
+      income: 0,
+      bookings: [],
+      listings: [],
+    });
+
+    viewer = await db.users.findOne({ _id: insertRes.insertedId });
+  }
+
+  return viewer;
+};
 
 export const viewerResolvers: IResolvers = {
   Query: {
-    authUrl: () => {
-      return "Query.authUrl";
+    authUrl: (): string => {
+      try {
+        return Google.authUrl;
+      } catch (error) {
+        throw new Error(`Failed to query Google Auth Url: ${error}`);
+      }
     },
   },
   Mutation: {
-    logIn: () => {
-      return "Mutation.logIn";
+    logIn: async (
+      _root: undefined,
+      { input }: LogInArgs,
+      { db }: { db: Database }
+    ): Promise<Viewer> => {
+      try {
+        const code = input?.code;
+
+        const token = crypto.randomBytes(16).toString("hex");
+
+        const viewer: User | null = code ? await logInViaGoogle(code, token, db) : null;
+
+        if (!viewer) {
+          return { didRequest: true };
+        }
+
+        return {
+          _id: viewer._id,
+          token: viewer.token,
+          avatar: viewer.avatar,
+          walletId: viewer.walletId,
+          didRequest: true,
+        };
+      } catch (error) {
+        throw new Error(`Failed to log in: ${error}`);
+      }
     },
-    logOut: () => {
-      return "Mutation.logOut";
+    logOut: (): Viewer => {
+      try {
+        return { didRequest: true };
+      } catch (error) {
+        throw new Error(`Failed to log out: ${error}`);
+      }
+    },
+  },
+  Viewer: {
+    id: (viewer: Viewer): string | undefined => {
+      return viewer._id;
+    },
+    hasWallet: (viewer: Viewer): boolean => {
+      return viewer?.walletId != null;
     },
   },
 };

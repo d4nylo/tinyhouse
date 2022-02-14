@@ -54,6 +54,14 @@ export interface User {
   listings: ObjectId[];
 }
 
+export interface Viewer {
+  _id?: string;
+  token?: string;
+  avatar?: string;
+  walletId?: string;
+  didRequest: boolean;
+}
+
 export interface Database {
   bookings: Collection<Booking>;
   listings: Collection<Listing>;
