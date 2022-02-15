@@ -47,7 +47,7 @@ export const MenuItems = ({ viewer, setViewer }: Props) => {
     );
 
   return (
-    <Menu mode="horizontal" selectable={false} className="menu">
+    <Menu mode="horizontal" selectable={false} className="menu" disabledOverflow={true}>
       <Item key="/host" icon={<HomeOutlined />}>
         <Link to="/host">Host</Link>
       </Item>
