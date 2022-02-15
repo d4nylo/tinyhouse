@@ -77,6 +77,7 @@ const logInViaGoogle = async (code: string, token: string, db: Database): Promis
 
 export const viewerResolvers: IResolvers = {
   Query: {
+    /* Returns a string and is expected to return the Google Sign-In/OAuth authentication URL. */
     authUrl: (): string => {
       try {
         return Google.authUrl;
@@ -86,6 +87,7 @@ export const viewerResolvers: IResolvers = {
     },
   },
   Mutation: {
+    /* Returns a Viewer object and is expected to log a viewer into the application. */
     logIn: async (
       _root: undefined,
       { input }: LogInArgs,
@@ -113,6 +115,7 @@ export const viewerResolvers: IResolvers = {
         throw new Error(`Failed to log in: ${error}`);
       }
     },
+    /* Returns a Viewer object and is expected to log a viewer out of the application. */
     logOut: (): Viewer => {
       try {
         return { didRequest: true };
