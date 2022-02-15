@@ -17,6 +17,9 @@ import "./styles/index.css";
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   uri: "/api",
+  headers: {
+    "X-CSRF-TOKEN": sessionStorage.getItem("token") || "",
+  },
 });
 
 const initialViewer: Viewer = {
@@ -34,6 +37,12 @@ const App = () => {
     onCompleted: (data) => {
       if (data && data.logIn) {
         setViewer(data.logIn);
+
+        if (data.logIn.token) {
+          sessionStorage.setItem("token", data.logIn.token);
+        } else {
+          sessionStorage.removeItem("token");
+        }
       }
     },
   });
