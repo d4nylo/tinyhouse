@@ -6,10 +6,7 @@ import { Affix, Layout, Spin } from "antd";
 import { AppHeader, Home, Host, Listing, Listings, Login, NotFound, User } from "./sections";
 import { AppHeaderSkeleton, ErrorBanner } from "./lib/components";
 import { LOG_IN } from "./lib/graphql/mutations";
-import {
-  LogIn as LogInData,
-  LogInVariables,
-} from "./lib/graphql/mutations/LogIn/__generated__/LogIn";
+import { LogIn as LogInData, LogInVariables } from "./lib/graphql/mutations/LogIn/__generated__/LogIn";
 import { Viewer } from "./lib/types";
 import reportWebVitals from "./reportWebVitals";
 import "./styles/index.css";
@@ -83,7 +80,7 @@ const App = () => {
           <Route path="/listing/:id" element={<Listing />}></Route>
           <Route path="/listings/:location?" element={<Listings title="TinyHouse" />}></Route>
           <Route path="/login" element={<Login setViewer={setViewer} />}></Route>
-          <Route path="/user/:id" element={<User />}></Route>
+          <Route path="/user/:id" element={<User viewer={viewer} />}></Route>
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
       </Layout>
