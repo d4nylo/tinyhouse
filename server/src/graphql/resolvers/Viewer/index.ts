@@ -1,10 +1,23 @@
 import crypto from "crypto";
+import { Request, Response } from "express";
 import { IResolvers } from "@graphql-tools/utils";
 import { Google } from "../../../lib/api";
 import { Database, User, Viewer } from "../../../lib/types";
 import { LogInArgs } from "./types";
 
-const logInViaGoogle = async (code: string, token: string, db: Database): Promise<User | null> => {
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: true,
+  signed: true,
+  secure: !(process.env.NODE_END === "development"),
+};
+
+const logInViaGoogle = async (
+  code: string,
+  token: string,
+  db: Database,
+  res: Response
+): Promise<User | null> => {
   const { user } = await Google.logIn(code);
 
   if (!user) {
@@ -72,6 +85,32 @@ const logInViaGoogle = async (code: string, token: string, db: Database): Promis
     viewer = await db.users.findOne({ _id: insertRes.insertedId });
   }
 
+  res.cookie("viewer", userId, {
+    ...cookieOptions,
+    maxAge: 365 * 24 * 60 * 60 * 1000,
+  });
+
+  return viewer;
+};
+
+const logInViaCookie = async (
+  token: string,
+  db: Database,
+  req: Request,
+  res: Response
+): Promise<User | null> => {
+  const updateRes = await db.users.findOneAndUpdate(
+    { _id: req.signedCookies.viewer },
+    { $set: { token } },
+    { returnDocument: "after" }
+  );
+
+  const viewer = updateRes.value;
+
+  if (!viewer) {
+    res.clearCookie("viewer", cookieOptions);
+  }
+
   return viewer;
 };
 
@@ -91,14 +130,16 @@ export const viewerResolvers: IResolvers = {
     logIn: async (
       _root: undefined,
       { input }: LogInArgs,
-      { db }: { db: Database }
+      { db, req, res }: { db: Database; req: Request; res: Response }
     ): Promise<Viewer> => {
       try {
         const code = input?.code;
 
         const token = crypto.randomBytes(16).toString("hex");
 
-        const viewer: User | null = code ? await logInViaGoogle(code, token, db) : null;
+        const viewer: User | null = code
+          ? await logInViaGoogle(code, token, db, res)
+          : await logInViaCookie(token, db, req, res);
 
         if (!viewer) {
           return { didRequest: true };
@@ -116,8 +157,10 @@ export const viewerResolvers: IResolvers = {
       }
     },
     /* Returns a Viewer object and is expected to log a viewer out of the application. */
-    logOut: (): Viewer => {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    logOut: (_root: undefined, _args: {}, { res }: { res: Response }): Viewer => {
       try {
+        res.clearCookie("viewer", cookieOptions);
         return { didRequest: true };
       } catch (error) {
         throw new Error(`Failed to log out: ${error}`);
