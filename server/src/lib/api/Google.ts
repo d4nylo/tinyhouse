@@ -7,6 +7,7 @@ const auth = new google.auth.OAuth2(
 );
 
 export const Google = {
+  /* Derives the authentication URL from Google's servers where users are directed to on the client to first sign-in with their Google account information. */
   authUrl: auth.generateAuthUrl({
     access_type: "online",
     scope: [
@@ -14,6 +15,7 @@ export const Google = {
       "https://www.googleapis.com/auth/userinfo.profile",
     ],
   }),
+  /* Function that uses Google's People API to get relevant information (i.e. their emails, names, and photos) for the Google account of a user. */
   logIn: async (code: string) => {
     const { tokens } = await auth.getToken(code);
 
