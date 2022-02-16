@@ -30,16 +30,17 @@ export interface Listing {
   title: string;
   description: string;
   image: string;
-  host: string;
+  host: string; // Id of the user who owns the listing
   type: ListingType;
   address: string;
   country: string;
   admin: string;
   city: string;
   bookings: ObjectId[];
-  bookingsIndex: BookingsIndex;
+  bookingsIndex: BookingsIndex; // key/value representation of the dates that have already been booked
   price: number;
   numOfGuests: number;
+  authorized?: boolean; // Check if viewer is querying his own listing
 }
 
 export interface User {
