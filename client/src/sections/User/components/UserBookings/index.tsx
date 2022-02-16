@@ -19,6 +19,7 @@ export const UserBookings = ({ userBookings, bookingsPage, limit, setBookingsPag
     <List
       grid={{
         gutter: 8,
+        column: 4,
         xs: 1,
         sm: 2,
         lg: 4,
