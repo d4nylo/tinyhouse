@@ -1,5 +1,5 @@
 @import "~antd/dist/antd.css";
-@import url(https://fonts.googleapis.com/css?family=Sacramento);
+@import url(https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100&display=swap);
 
 .menu {
   width: 100%;
@@ -394,7 +394,7 @@
   font-size: 13px;
 }
 .listing-details__host-name {
-  font-family: Sacramento, cursive;
+  font-family: "JetBrains Mono", monospace;
   display: inline-block;
   padding-left: 10px;
   position: relative;

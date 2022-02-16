@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { Layout } from "antd";
+import { Col, Layout, Row } from "antd";
 import { ErrorBanner, PageSkeleton } from "../../lib/components";
 import { LISTING } from "../../lib/graphql/queries";
 import { Listing as ListingData, ListingVariables } from "../../lib/graphql/queries/Listing/__generated__/Listing";
+import { ListingBookings, ListingDetails } from "./components";
 
 const { Content } = Layout;
 
@@ -43,8 +44,25 @@ export const Listing = () => {
   const listing = data ? data.listing : null;
   const listingBookings = listing ? listing.bookings : null;
 
-  console.log(listing);
-  console.log(listingBookings);
+  const listingDetailsElement = listing ? <ListingDetails listing={listing} /> : null;
 
-  return <h2>Listing</h2>;
+  const listingBookingsElement = listingBookings ? (
+    <ListingBookings
+      listingBookings={listingBookings}
+      bookingsPage={bookingsPage}
+      limit={PAGE_LIMIT}
+      setBookingsPage={setBookingsPage}
+    />
+  ) : null;
+
+  return (
+    <Content className="listings">
+      <Row gutter={24} justify="space-between">
+        <Col>
+          {listingDetailsElement}
+          {listingBookingsElement}
+        </Col>
+      </Row>
+    </Content>
+  );
 };
