@@ -23,9 +23,17 @@ export interface ListingsArgs {
   filter: ListingsFilter;
   limit: number;
   page: number;
+  location: string | null;
 }
 
 export interface ListingsData {
+  region: string | null;
   total: number;
   result: Listing[];
+}
+
+export interface ListingsQuery {
+  country?: string;
+  admin?: string;
+  city?: string;
 }
