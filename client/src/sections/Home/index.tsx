@@ -1,7 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Col, Row, Layout, Typography } from "antd";
+import { useQuery } from "@apollo/client";
+import { LISTINGS } from "../../lib/graphql/queries";
+import { Listings as ListingsData, ListingsVariables } from "../../lib/graphql/queries/Listings/__generated__/Listings";
+import { ListingsFilter } from "../../lib/graphql/globalTypes";
 import { displayErrorMessage } from "../../lib/utils";
-import { HomeHero } from "./components";
+import { HomeHero, HomeListings, HomeListingsSkeleton } from "./components";
 
 import imgCancun from "./assets/cancun.jpeg";
 import imgMapBackground from "./assets/map-background.jpeg";
@@ -10,7 +14,30 @@ import imgSanFrancisco from "./assets/san-fransisco.jpeg";
 const { Content } = Layout;
 const { Paragraph, Title } = Typography;
 
+const PAGE_LIMIT = 4;
+const PAGE_NUMBER = 1;
+
 export const Home = () => {
+  const { loading, data } = useQuery<ListingsData, ListingsVariables>(LISTINGS, {
+    variables: {
+      filter: ListingsFilter.PRICE_HIGH_TO_LOW,
+      limit: PAGE_LIMIT,
+      page: PAGE_NUMBER,
+    },
+  });
+
+  const renderListingsSection = () => {
+    if (loading) {
+      return <HomeListingsSkeleton />;
+    }
+
+    if (data) {
+      return <HomeListings title="Premium Listings" listings={data.listings.result} />;
+    }
+
+    return null;
+  };
+
   const navigate = useNavigate();
 
   const onSearch = (value: string) => {
@@ -36,6 +63,8 @@ export const Home = () => {
           Popular listings in the United States
         </Link>
       </div>
+
+      {renderListingsSection()}
 
       <div className="home__listings">
         <Title level={4} className="home__listings-title">
