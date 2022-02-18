@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Affix, Layout, List, Typography } from "antd";
-import { ListingCard } from "../../lib/components";
+import { ErrorBanner, ListingCard } from "../../lib/components";
 import { LISTINGS } from "../../lib/graphql/queries";
 import { Listings as ListingsData, ListingsVariables } from "../../lib/graphql/queries/Listings/__generated__/Listings";
 import { ListingsFilter } from "../../lib/graphql/globalTypes";
-import { ListingsFilters, ListingsPagination } from "./components";
+import { ListingsFilters, ListingsPagination, ListingsSkeleton } from "./components";
 
 const { Content } = Layout;
 const { Paragraph, Text, Title } = Typography;
@@ -19,7 +19,7 @@ export const Listings = () => {
 
   const { location } = useParams();
 
-  const { data } = useQuery<ListingsData, ListingsVariables>(LISTINGS, {
+  const { loading, data, error } = useQuery<ListingsData, ListingsVariables>(LISTINGS, {
     variables: {
       location: location || "",
       filter: filter,
@@ -27,6 +27,23 @@ export const Listings = () => {
       page: page,
     },
   });
+
+  if (loading) {
+    return (
+      <Content className="listings">
+        <ListingsSkeleton numOfItems={PAGE_LIMIT} />
+      </Content>
+    );
+  }
+
+  if (error) {
+    return (
+      <Content className="listings">
+        <ErrorBanner description="We either couldn't find anything matching your search or have encountered an error. If you're searching for a unique location, try searching again with more common keywords." />
+        <ListingsSkeleton numOfItems={PAGE_LIMIT} />
+      </Content>
+    );
+  }
 
   const listings = data ? data.listings : null;
   const listingsRegion = listings ? listings.region : null;
