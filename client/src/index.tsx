@@ -78,7 +78,8 @@ const App = () => {
           <Route path="/" element={<Home />}></Route>
           <Route path="/host" element={<Host />}></Route>
           <Route path="/listing/:id" element={<Listing />}></Route>
-          <Route path="/listings/:location?" element={<Listings />}></Route>
+          <Route path="/listings" element={<Listings />}></Route>
+          <Route path="/listings/:location" element={<Listings />}></Route>
           <Route path="/login" element={<Login setViewer={setViewer} />}></Route>
           <Route path="/user/:id" element={<User viewer={viewer} />}></Route>
           <Route path="*" element={<NotFound />}></Route>
