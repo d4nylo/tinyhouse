@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { Layout, List, Typography } from "antd";
+import { Affix, Layout, List, Typography } from "antd";
 import { ListingCard } from "../../lib/components";
 import { LISTINGS } from "../../lib/graphql/queries";
 import { Listings as ListingsData, ListingsVariables } from "../../lib/graphql/queries/Listings/__generated__/Listings";
 import { ListingsFilter } from "../../lib/graphql/globalTypes";
-import { ListingsFilters } from "./components";
+import { ListingsFilters, ListingsPagination } from "./components";
 
 const { Content } = Layout;
 const { Paragraph, Text, Title } = Typography;
@@ -15,6 +15,7 @@ const PAGE_LIMIT = 8;
 
 export const Listings = () => {
   const [filter, setFilter] = useState(ListingsFilter.PRICE_LOW_TO_HIGH);
+  const [page, setPage] = useState(1);
 
   const { location } = useParams();
 
@@ -23,7 +24,7 @@ export const Listings = () => {
       location: location || "",
       filter: filter,
       limit: PAGE_LIMIT,
-      page: 1,
+      page: page,
     },
   });
 
@@ -31,9 +32,14 @@ export const Listings = () => {
   const listingsRegion = listings ? listings.region : null;
 
   const listingsSectionElement =
-    listings && listings.result.length > 0 ? (
+    listings && listings.result && listings.result.length > 0 ? (
       <div>
-        <ListingsFilters filter={filter} setFilter={setFilter} />
+        <Affix offsetTop={64}>
+          <div className="listings__affix">
+            <ListingsPagination limit={PAGE_LIMIT} page={page} setPage={setPage} total={listings.total} />
+            <ListingsFilters filter={filter} setFilter={setFilter} />
+          </div>
+        </Affix>
         <List
           grid={{ gutter: 8, column: 4, xs: 1, sm: 2, lg: 4 }}
           dataSource={listings.result}
