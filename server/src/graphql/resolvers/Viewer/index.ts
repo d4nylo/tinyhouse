@@ -12,12 +12,7 @@ const cookieOptions = {
   secure: !(process.env.NODE_END === "development"),
 };
 
-const logInViaGoogle = async (
-  code: string,
-  token: string,
-  db: Database,
-  res: Response
-): Promise<User | null> => {
+const logInViaGoogle = async (code: string, token: string, db: Database, res: Response): Promise<User | null> => {
   const { user } = await Google.logIn(code);
 
   if (!user) {
@@ -27,8 +22,7 @@ const logInViaGoogle = async (
   // Name/Photo/Email Lists
   const userNamesList = user.names && user.names.length ? user.names : null;
   const userPhotosList = user.photos && user.photos.length ? user.photos : null;
-  const userEmailsList =
-    user.emailAddresses && user.emailAddresses.length ? user.emailAddresses : null;
+  const userEmailsList = user.emailAddresses && user.emailAddresses.length ? user.emailAddresses : null;
 
   // User Display Name
   const userName = userNamesList ? userNamesList[0].displayName : null;
@@ -93,12 +87,7 @@ const logInViaGoogle = async (
   return viewer;
 };
 
-const logInViaCookie = async (
-  token: string,
-  db: Database,
-  req: Request,
-  res: Response
-): Promise<User | null> => {
+const logInViaCookie = async (token: string, db: Database, req: Request, res: Response): Promise<User | null> => {
   const updateRes = await db.users.findOneAndUpdate(
     { _id: req.signedCookies.viewer },
     { $set: { token } },
@@ -165,6 +154,12 @@ export const viewerResolvers: IResolvers = {
       } catch (error) {
         throw new Error(`Failed to log out: ${error}`);
       }
+    },
+    connectStripe: (): Viewer => {
+      return { didRequest: true };
+    },
+    disconnectStripe: (): Viewer => {
+      return { didRequest: true };
     },
   },
   Viewer: {
