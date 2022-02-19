@@ -97,6 +97,11 @@ export const listingResolvers: IResolvers = {
       }
     },
   },
+  Mutation: {
+    hostListing: () => {
+      return "Mutation.hostListing";
+    },
+  },
   Listing: {
     id: (listing: Listing): string => {
       return listing._id.toString();
