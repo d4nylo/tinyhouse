@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { ApolloClient, ApolloProvider, InMemoryCache, useMutation } from "@apollo/client";
+import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache, useMutation } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 import { Affix, Layout, Spin } from "antd";
-import { AppHeader, Home, Host, Listing, Listings, Login, NotFound, User } from "./sections";
+import { AppHeader, Home, Host, Listing, Listings, Login, NotFound, Stripe, User } from "./sections";
 import { AppHeaderSkeleton, ErrorBanner } from "./lib/components";
 import { LOG_IN } from "./lib/graphql/mutations";
 import { LogIn as LogInData, LogInVariables } from "./lib/graphql/mutations/LogIn/__generated__/LogIn";
@@ -11,12 +12,27 @@ import { Viewer } from "./lib/types";
 import reportWebVitals from "./reportWebVitals";
 import "./styles/index.css";
 
+// const client = new ApolloClient({
+//   cache: new InMemoryCache(),
+//   uri: "/api",
+//   headers: {
+//     "X-CSRF-TOKEN": sessionStorage.getItem("token") || "",
+//   },
+// });
+
+const httpLink = createHttpLink({ uri: "/api" });
+
+const authLink = setContext(() => {
+  return {
+    headers: {
+      "X-CSRF-TOKEN": sessionStorage.getItem("token"),
+    },
+  };
+});
+
 const client = new ApolloClient({
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
-  uri: "/api",
-  headers: {
-    "X-CSRF-TOKEN": sessionStorage.getItem("token") || "",
-  },
 });
 
 const initialViewer: Viewer = {
@@ -81,6 +97,7 @@ const App = () => {
           <Route path="/listings" element={<Listings />}></Route>
           <Route path="/listings/:location" element={<Listings />}></Route>
           <Route path="/login" element={<Login setViewer={setViewer} />}></Route>
+          <Route path="/stripe" element={<Stripe viewer={viewer} setViewer={setViewer} />}></Route>
           <Route path="/user/:id" element={<User viewer={viewer} />}></Route>
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
