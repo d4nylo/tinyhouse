@@ -12,17 +12,18 @@ const { Content } = Layout;
 
 interface Props {
   viewer: Viewer;
+  setViewer: (viewer: Viewer) => void;
 }
 
 const PAGE_LIMIT = 4;
 
-export const User = ({ viewer }: Props) => {
+export const User = ({ viewer, setViewer }: Props) => {
   const [listingsPage, setListingsPage] = useState(1);
   const [bookingsPage, setBookingsPage] = useState(1);
 
   const { id } = useParams();
 
-  const { data, loading, error } = useQuery<UserData, UserVariables>(USER, {
+  const { data, loading, error, refetch } = useQuery<UserData, UserVariables>(USER, {
     variables: {
       id: id || "",
       bookingsPage,
@@ -72,7 +73,15 @@ export const User = ({ viewer }: Props) => {
     />
   ) : null;
 
-  const userProfileElement = user ? <UserProfile user={user} viewerIsUser={viewerIsUser} /> : null;
+  const userProfileElement = user ? (
+    <UserProfile
+      user={user}
+      viewer={viewer}
+      viewerIsUser={viewerIsUser}
+      setViewer={setViewer}
+      handleUserRefetch={refetch}
+    />
+  ) : null;
 
   const stripeError = new URL(window.location.href).searchParams.get("stripe_error");
   const stripeErrorBanner = stripeError ? (
