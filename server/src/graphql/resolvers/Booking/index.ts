@@ -2,9 +2,46 @@ import { IResolvers } from "@graphql-tools/utils";
 import { Request } from "express";
 import { ObjectId } from "mongodb";
 import { Stripe } from "../../../lib/api";
-import { Booking, Database, Listing } from "../../../lib/types";
+import { Booking, BookingsIndex, Database, Listing } from "../../../lib/types";
 import { authorize } from "../../../lib/utils";
 import { CreateBookingArgs } from "./types";
+
+const MILISECONDS_IN_A_DAY = 86400000; // 24h * 60m * 60s * 1000ms
+
+// Create a new `bookingsIndex` from the check-in and check-out dates of a booking
+const resolveBookingsIndex = (
+  bookingsIndex: BookingsIndex,
+  checkInDate: string,
+  checkOutDate: string
+): BookingsIndex => {
+  let dateCursor = new Date(checkInDate);
+  const checkOut = new Date(checkOutDate);
+  const newBookingsIndex: BookingsIndex = { ...bookingsIndex };
+
+  while (dateCursor <= checkOut) {
+    const y = dateCursor.getUTCFullYear();
+    const m = dateCursor.getUTCMonth(); // 0 to 11 (0: Jan., ..., 11: Dec.)
+    const d = dateCursor.getUTCDate();
+
+    if (!newBookingsIndex[y]) {
+      newBookingsIndex[y] = {};
+    }
+
+    if (!newBookingsIndex[y][m]) {
+      newBookingsIndex[y][m] = {};
+    }
+
+    if (!newBookingsIndex[y][m][d]) {
+      newBookingsIndex[y][m][d] = true;
+    } else {
+      throw new Error("selected dates can't overlap dates that have already been booked");
+    }
+
+    dateCursor = new Date(dateCursor.getTime() + MILISECONDS_IN_A_DAY);
+  }
+
+  return newBookingsIndex;
+};
 
 export const bookingResolvers: IResolvers = {
   Booking: {
@@ -14,6 +51,10 @@ export const bookingResolvers: IResolvers = {
     // eslint-disable-next-line @typescript-eslint/ban-types
     listing: (booking: Booking, _args: {}, { db }: { db: Database }): Promise<Listing | null> => {
       return db.listings.findOne({ _id: booking.listing });
+    },
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    tenant: (booking: Booking, _args: {}, { db }: { db: Database }) => {
+      return db.users.findOne({ _id: booking.tenant });
     },
   },
   Mutation: {
@@ -46,6 +87,8 @@ export const bookingResolvers: IResolvers = {
           throw new Error("check out date can't be before check in date");
         }
 
+        const bookingsIndex = resolveBookingsIndex(listing.bookingsIndex, checkIn, checkOut);
+
         const host = await db.users.findOne({
           _id: listing.host,
         });
@@ -58,8 +101,8 @@ export const bookingResolvers: IResolvers = {
           throw new Error("the host is not connected with Stripe");
         }
 
-        // 86400000 => Milliseconds in a Day => 24h * 60m * 60s * 1000ms
-        const totalPrice = listing.price * ((checkOutDate.getTime() - checkInDate.getTime()) / 86400000 + 1);
+        const totalPrice =
+          listing.price * ((checkOutDate.getTime() - checkInDate.getTime()) / MILISECONDS_IN_A_DAY + 1);
 
         await Stripe.charge(totalPrice, source, host.walletId);
 
@@ -77,19 +120,17 @@ export const bookingResolvers: IResolvers = {
           throw new Error("Failed to insert booking");
         }
 
-        // Update the host user document to increment ("$inc") the income field by the totalPrice
+        // Update the host user document to increment ("$inc") the `income` field by the totalPrice
         await db.users.updateOne({ _id: host._id }, { $inc: { income: totalPrice } });
 
-        // Update the viewer user document to push ("$push") a new booking to the bookings field
+        // Update the viewer user document to push ("$push") the new booking id to the `bookings` field
         await db.users.updateOne({ _id: viewer._id }, { $push: { bookings: insertedBooking._id } });
 
-        // TODO
-        //const bookingsIndex = resolveBookingsIndex(listing.bookingsIndex, checkIn, checkOut);
-
+        // Update the listing document `bookingsIndex` field & push the new booking id to the `bookings` array field
         await db.listings.updateOne(
           { _id: listing._id },
           {
-            //$set: { bookingsIndex }, // TODO
+            $set: { bookingsIndex },
             $push: { bookings: insertedBooking._id },
           }
         );
