@@ -1,4 +1,5 @@
 import express, { Application } from "express";
+import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
@@ -7,6 +8,9 @@ import { typeDefs, resolvers } from "./graphql";
 
 const mount = async (app: Application) => {
   const db = await connectDatabase();
+
+  // Increase the request body size to 2MB
+  app.use(bodyParser.json({ limit: "2mb" }));
 
   app.use(cookieParser(process.env.SECRET));
 
