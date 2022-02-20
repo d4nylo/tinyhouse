@@ -108,7 +108,7 @@ export const Host = ({ viewer }: Props) => {
               name="image"
               listType="picture-card"
               showUploadList={false}
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76" // Workaround suggested in Antd
+              customRequest={dummyRequest}
               beforeUpload={beforeImageUpload}
               onChange={handleImageUpload}
             >
@@ -162,4 +162,11 @@ const getBase64Value = (img: File | Blob, callback: (imageBase64Value: string) =
   reader.onerror = (error) => {
     console.log(error);
   };
+};
+
+// Dummy request function that simulates a flow of a successful upload. (https://stackoverflow.com/a/51519603)
+const dummyRequest = ({ onSuccess }: any) => {
+  setTimeout(() => {
+    onSuccess("ok");
+  }, 0);
 };
