@@ -11,4 +11,9 @@ export const bookingResolvers: IResolvers = {
       return db.listings.findOne({ _id: booking.listing });
     },
   },
+  Mutation: {
+    createBooking: () => {
+      return "Mutation.createBooking";
+    },
+  },
 };
