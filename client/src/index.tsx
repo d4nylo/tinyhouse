@@ -93,7 +93,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/host" element={<Host viewer={viewer} />}></Route>
-          <Route path="/listing/:id" element={<Listing />}></Route>
+          <Route path="/listing/:id" element={<Listing viewer={viewer} />}></Route>
           <Route path="/listings" element={<Listings />}></Route>
           <Route path="/listings/:location" element={<Listings />}></Route>
           <Route path="/login" element={<Login setViewer={setViewer} />}></Route>
