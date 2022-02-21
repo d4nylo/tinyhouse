@@ -13,6 +13,14 @@ export const Stripe = {
 
     return response;
   },
+  disconnect: async (stripeUserId: string) => {
+    const response = await client.oauth.deauthorize({
+      client_id: `${process.env.S_CLIENT_ID}`,
+      stripe_user_id: stripeUserId,
+    });
+
+    return response;
+  },
   charge: async (amount: number, source: string, stripeAccount: string) => {
     try {
       const res = await client.charges.create(
