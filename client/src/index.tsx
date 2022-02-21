@@ -1,24 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache, useMutation } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { Affix, Layout, Spin } from "antd";
-import { AppHeader, Home, Host, Listing, Listings, Login, NotFound, Stripe, User } from "./sections";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppHeaderSkeleton, ErrorBanner } from "./lib/components";
 import { LOG_IN } from "./lib/graphql/mutations";
 import { LogIn as LogInData, LogInVariables } from "./lib/graphql/mutations/LogIn/__generated__/LogIn";
 import { Viewer } from "./lib/types";
+import { AppHeader, Home, Host, Listing, Listings, Login, NotFound, Stripe, User } from "./sections";
 import reportWebVitals from "./reportWebVitals";
 import "./styles/index.css";
-
-// const client = new ApolloClient({
-//   cache: new InMemoryCache(),
-//   uri: "/api",
-//   headers: {
-//     "X-CSRF-TOKEN": sessionStorage.getItem("token") || "",
-//   },
-// });
 
 const httpLink = createHttpLink({ uri: "/api" });
 
@@ -42,6 +36,8 @@ const initialViewer: Viewer = {
   hasWallet: null,
   token: null,
 };
+
+const stripePromise = loadStripe(process.env.REACT_APP_S_PUBLISHABLE_KEY as string);
 
 const App = () => {
   const [viewer, setViewer] = useState<Viewer>(initialViewer);
@@ -93,7 +89,14 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/host" element={<Host viewer={viewer} />}></Route>
-          <Route path="/listing/:id" element={<Listing viewer={viewer} />}></Route>
+          <Route
+            path="/listing/:id"
+            element={
+              <Elements stripe={stripePromise}>
+                <Listing viewer={viewer} />
+              </Elements>
+            }
+          ></Route>
           <Route path="/listings" element={<Listings />}></Route>
           <Route path="/listings/:location" element={<Listings />}></Route>
           <Route path="/login" element={<Login setViewer={setViewer} />}></Route>
