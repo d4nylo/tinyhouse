@@ -16,6 +16,7 @@ interface Props {
   viewer: Viewer;
   host: ListingData["listing"]["host"];
   bookingsIndex: ListingData["listing"]["bookingsIndex"];
+  setModalVisible: (modalVisible: boolean) => void;
 }
 
 export const ListingCreateBooking = ({
@@ -27,6 +28,7 @@ export const ListingCreateBooking = ({
   viewer,
   host,
   bookingsIndex,
+  setModalVisible,
 }: Props) => {
   // bookingsIndex is sent as a string from the server to the client.
   const bookingsIndexJSON: BookingsIndex = JSON.parse(bookingsIndex);
@@ -128,7 +130,13 @@ export const ListingCreateBooking = ({
           </div>
         </div>
         <Divider />
-        <Button disabled={buttonDisabled} size="large" type="primary" className="listing-booking__card-cta">
+        <Button
+          disabled={buttonDisabled}
+          size="large"
+          type="primary"
+          className="listing-booking__card-cta"
+          onClick={() => setModalVisible(true)}
+        >
           Request to book!
         </Button>
         <Text type="secondary" mark>

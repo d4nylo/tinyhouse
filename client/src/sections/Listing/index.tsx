@@ -6,7 +6,7 @@ import { Moment } from "moment";
 import { ErrorBanner, PageSkeleton } from "../../lib/components";
 import { LISTING } from "../../lib/graphql/queries";
 import { Listing as ListingData, ListingVariables } from "../../lib/graphql/queries/Listing/__generated__/Listing";
-import { ListingCreateBooking, ListingBookings, ListingDetails } from "./components";
+import { ListingCreateBooking, ListingBookings, ListingDetails, ListingCreateBookingModal } from "./components";
 import { Viewer } from "../../lib/types";
 
 const { Content } = Layout;
@@ -21,6 +21,7 @@ export const Listing = ({ viewer }: Props) => {
   const [bookingsPage, setBookingsPage] = useState(1);
   const [checkInDate, setCheckInDate] = useState<Moment | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Moment | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const { id } = useParams();
 
@@ -73,8 +74,20 @@ export const Listing = ({ viewer }: Props) => {
       viewer={viewer}
       host={listing.host}
       bookingsIndex={listing.bookingsIndex}
+      setModalVisible={setModalVisible}
     />
   ) : null;
+
+  const listingCreateBookingModalElement =
+    listing && checkInDate && checkOutDate ? (
+      <ListingCreateBookingModal
+        price={listing.price}
+        modalVisible={modalVisible}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
+        setModalVisible={setModalVisible}
+      />
+    ) : null;
 
   return (
     <Content className="listings">
@@ -87,6 +100,7 @@ export const Listing = ({ viewer }: Props) => {
           {listingCreateBooking}
         </Col>
       </Row>
+      {listingCreateBookingModalElement}
     </Content>
   );
 };
