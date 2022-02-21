@@ -25,13 +25,17 @@ export const Listing = ({ viewer }: Props) => {
 
   const { id } = useParams();
 
-  const { loading, data, error } = useQuery<ListingData, ListingVariables>(LISTING, {
+  const { loading, data, error, refetch } = useQuery<ListingData, ListingVariables>(LISTING, {
     variables: {
       id: id || "",
       bookingsPage,
       limit: PAGE_LIMIT,
     },
   });
+
+  const handleListingRefetch = async () => {
+    await refetch();
+  };
 
   if (loading) {
     return (
@@ -78,14 +82,23 @@ export const Listing = ({ viewer }: Props) => {
     />
   ) : null;
 
+  const clearBookingData = () => {
+    setModalVisible(false);
+    setCheckInDate(null);
+    setCheckOutDate(null);
+  };
+
   const listingCreateBookingModalElement =
     listing && checkInDate && checkOutDate ? (
       <ListingCreateBookingModal
+        id={listing.id}
         price={listing.price}
         modalVisible={modalVisible}
         checkInDate={checkInDate}
         checkOutDate={checkOutDate}
         setModalVisible={setModalVisible}
+        clearBookingData={clearBookingData}
+        handleListingRefetch={handleListingRefetch}
       />
     ) : null;
 

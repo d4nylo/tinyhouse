@@ -1,42 +1,83 @@
-import { Button, Divider, Modal, Typography } from "antd";
 import { KeyOutlined } from "@ant-design/icons";
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useMutation } from "@apollo/client";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Button, Divider, Modal, Typography } from "antd";
 import moment, { Moment } from "moment";
-import { formatListingPrice } from "../../../../lib/utils";
+import { CREATE_BOOKING } from "../../../../lib/graphql/mutations";
+import {
+  CreateBooking as CreateBookingData,
+  CreateBookingVariables,
+} from "../../../../lib/graphql/mutations/CreateBooking/__generated__/CreateBooking";
+import { displayErrorMessage, displaySuccessNotification, formatListingPrice } from "../../../../lib/utils";
 
 interface Props {
+  id: string;
   price: number;
   modalVisible: boolean;
   checkInDate: Moment;
   checkOutDate: Moment;
   setModalVisible: (modalVisible: boolean) => void;
+  clearBookingData: () => void;
+  handleListingRefetch: () => Promise<void>;
 }
 
 const { Paragraph, Text, Title } = Typography;
 
 export const ListingCreateBookingModal = ({
+  id,
   price,
   modalVisible,
   checkInDate,
   checkOutDate,
   setModalVisible,
+  clearBookingData,
+  handleListingRefetch,
 }: Props) => {
-  const daysBooked = checkOutDate.diff(checkInDate, "days") + 1;
-  const listingPrice = price * daysBooked;
-
   const stripe = useStripe();
   const elements = useElements();
 
+  const [createBooking, { loading }] = useMutation<CreateBookingData, CreateBookingVariables>(CREATE_BOOKING, {
+    onCompleted: () => {
+      clearBookingData();
+      displaySuccessNotification(
+        "You've successfully booked the listing!",
+        "Booking history can always be found in your User page."
+      );
+      handleListingRefetch();
+    },
+    onError: (err) => {
+      console.log(err);
+      displayErrorMessage("Sorry! We weren't able to successfully book the listing. Please try again later!");
+    },
+  });
+
+  const daysBooked = checkOutDate.diff(checkInDate, "days") + 1;
+  const listingPrice = price * daysBooked;
+
   const handleCreateBooking = async () => {
     if (!stripe || !elements) {
-      return;
+      return displayErrorMessage("Sorry! We weren't able to connect with Stripe");
     }
 
     const cardElement = elements.getElement(CardElement);
 
     if (cardElement) {
-      const { token: stripeToken } = await stripe.createToken(cardElement);
-      console.log(stripeToken);
+      const { token: stripeToken, error } = await stripe.createToken(cardElement);
+
+      if (stripeToken) {
+        createBooking({
+          variables: {
+            input: {
+              id: id,
+              source: stripeToken.id,
+              checkIn: moment(checkInDate).format("YYYY-MM-DD"),
+              checkOut: moment(checkOutDate).format("YYYY-MM-DD"),
+            },
+          },
+        });
+      } else {
+        displayErrorMessage(error?.message ?? "Sorry! We weren't able to book the listing. Please try again later.");
+      }
     }
   };
 
@@ -79,12 +120,12 @@ export const ListingCreateBookingModal = ({
 
         <div className="listing-booking-modal__stripe-card-section">
           <CardElement className="listing-booking-modal__stripe-card" options={{ hidePostalCode: true }} />
-
           <Button
             size="large"
             type="primary"
             className="listing-booking-modal__cta"
             onClick={handleCreateBooking}
+            loading={loading}
             disabled={!stripe || !elements}
           >
             Book
