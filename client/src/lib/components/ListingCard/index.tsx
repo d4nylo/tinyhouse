@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Card, Typography } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, BankOutlined, HomeOutlined } from "@ant-design/icons";
 import { iconColor, formatListingPrice } from "../../utils";
+import { ListingType } from "../../graphql/globalTypes";
 
 interface Props {
   listing: {
@@ -11,13 +12,14 @@ interface Props {
     address: string;
     price: number;
     numOfGuests: number;
+    type: ListingType;
   };
 }
 
 const { Text, Title } = Typography;
 
 export const ListingCard = ({ listing }: Props) => {
-  const { id, title, image, address, price, numOfGuests } = listing;
+  const { id, title, image, address, price, numOfGuests, type } = listing;
 
   return (
     <Link to={`/listing/${id}`}>
@@ -37,7 +39,14 @@ export const ListingCard = ({ listing }: Props) => {
           </div>
           <div className="listing-card__dimensions listing-card__dimensions--guests">
             <UserOutlined style={{ color: iconColor }} />
-            <Text>{numOfGuests} guests</Text>
+            <Text> {numOfGuests} guests</Text>
+          </div>
+          <div className="listing-card__dimensions">
+            {type === ListingType.APARTMENT ? (
+              <BankOutlined style={{ color: iconColor }} />
+            ) : (
+              <HomeOutlined style={{ color: iconColor }} />
+            )}
           </div>
         </div>
       </Card>

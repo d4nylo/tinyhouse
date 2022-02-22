@@ -20,6 +20,7 @@ export const USER = gql`
             address
             price
             numOfGuests
+            type
           }
           checkIn
           checkOut
@@ -34,6 +35,7 @@ export const USER = gql`
           address
           price
           numOfGuests
+          type
         }
       }
     }
