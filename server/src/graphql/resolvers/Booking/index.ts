@@ -2,11 +2,11 @@ import { IResolvers } from "@graphql-tools/utils";
 import { Request } from "express";
 import { ObjectId } from "mongodb";
 import { Stripe } from "../../../lib/api";
-import { Booking, BookingsIndex, Database, Listing } from "../../../lib/types";
+import { Booking, BookingsIndex, Database, Listing, User } from "../../../lib/types";
 import { authorize } from "../../../lib/utils";
 import { CreateBookingArgs } from "./types";
 
-const MILISECONDS_IN_A_DAY = 86400000; // 24h * 60m * 60s * 1000ms
+const MILISECONDS_PER_DAY = 60 * 60 * 24 * 1000; // 86400000
 
 // Create a new `bookingsIndex` from the check-in and check-out dates of a booking
 const resolveBookingsIndex = (
@@ -37,7 +37,7 @@ const resolveBookingsIndex = (
       throw new Error("selected dates can't overlap dates that have already been booked");
     }
 
-    dateCursor = new Date(dateCursor.getTime() + MILISECONDS_IN_A_DAY);
+    dateCursor = new Date(dateCursor.getTime() + MILISECONDS_PER_DAY);
   }
 
   return newBookingsIndex;
@@ -53,7 +53,7 @@ export const bookingResolvers: IResolvers = {
       return db.listings.findOne({ _id: booking.listing });
     },
     // eslint-disable-next-line @typescript-eslint/ban-types
-    tenant: (booking: Booking, _args: {}, { db }: { db: Database }) => {
+    tenant: (booking: Booking, _args: {}, { db }: { db: Database }): Promise<User | null> => {
       return db.users.findOne({ _id: booking.tenant });
     },
   },
@@ -101,8 +101,7 @@ export const bookingResolvers: IResolvers = {
           throw new Error("the host is not connected with Stripe");
         }
 
-        const totalPrice =
-          listing.price * ((checkOutDate.getTime() - checkInDate.getTime()) / MILISECONDS_IN_A_DAY + 1);
+        const totalPrice = listing.price * ((checkOutDate.getTime() - checkInDate.getTime()) / MILISECONDS_PER_DAY + 1);
 
         await Stripe.charge(totalPrice, source, host.walletId);
 

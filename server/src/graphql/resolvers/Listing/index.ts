@@ -119,7 +119,7 @@ export const listingResolvers: IResolvers = {
       _root: undefined,
       { input }: HostListingArgs,
       { db, req }: { db: Database; req: Request }
-    ): Promise<Listing | null> => {
+    ): Promise<Listing> => {
       verifyHostListingInput(input);
 
       const viewer = await authorize(db, req);
@@ -149,16 +149,18 @@ export const listingResolvers: IResolvers = {
 
       const insertedListing = await db.listings.findOne({ _id: insertRes.insertedId });
 
-      if (insertedListing) {
-        await db.users.updateOne(
-          { _id: viewer._id },
-          {
-            $push: {
-              listings: insertedListing._id,
-            },
-          }
-        );
+      if (!insertedListing) {
+        throw new Error("Failed to insert listing");
       }
+
+      await db.users.updateOne(
+        { _id: viewer._id },
+        {
+          $push: {
+            listings: insertedListing._id,
+          },
+        }
+      );
 
       return insertedListing;
     },
