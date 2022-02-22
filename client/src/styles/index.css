@@ -1,5 +1,5 @@
 @import "~antd/dist/antd.css";
-@import url(https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Sacramento);
 
 .menu {
   width: 100%;
@@ -27,8 +27,18 @@
   display: inline-block;
   padding: 0 20px;
 }
+@media (max-width: 36em) {
+  .app-header__logo {
+    padding: 0 10px;
+  }
+}
 .app-header__logo img {
-  width: 36px;
+  width: 35px;
+}
+@media (max-width: 36em) {
+  .app-header__logo img {
+    width: 26px;
+  }
 }
 .app-header__search-input {
   display: flex;
@@ -40,6 +50,11 @@
   border: 0;
   width: 100%;
   max-width: 460px;
+}
+@media (max-width: 36em) {
+  .app-header__search-input .ant-input-group {
+    max-width: fit-content;
+  }
 }
 .app-header__search-input .ant-input-group input {
   border: 1px solid #f0f1f2;
@@ -62,8 +77,19 @@
 .app-header-skeleton__logo {
   padding: 0 20px;
 }
+@media (max-width: 36em) {
+  .app-header-skeleton__logo {
+    padding: 0 10px;
+  }
+}
 .app-header-skeleton__logo img {
-  width: 55px;
+  width: 35px;
+}
+
+@media (max-width: 36em) {
+  .app-header-skeleton__logo img {
+    width: 26px;
+  }
 }
 .app-header-skeleton__search-input {
   display: flex;
@@ -99,7 +125,7 @@
   right: 0;
 }
 .listing-card__description {
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 .listing-card__price.ant-typography {
   color: #1d226c;
@@ -206,7 +232,7 @@
 }
 .home {
   padding: 60px 120px;
-  background-image: url(https://www.tinyhouse.app/static/media/map-background.c21df147.jpg);
+  background-image: url("../sections/Home/assets/map-background.jpeg");
   background-repeat: no-repeat;
   background-position: 10% 0;
 }
@@ -351,7 +377,7 @@
   padding-top: 5px;
 }
 .listing-booking-modal__stripe-card-section {
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 }
 .listing-booking-modal__stripe-card {
   padding: 10px;
@@ -394,7 +420,7 @@
   font-size: 13px;
 }
 .listing-details__host-name {
-  font-family: "JetBrains Mono", monospace;
+  font-family: Sacramento, cursive;
   display: inline-block;
   padding-left: 10px;
   position: relative;
@@ -464,7 +490,6 @@
 }
 .listings {
   padding: 60px 120px;
-  min-width: 100%;
 }
 @media (max-width: 75em) {
   .listings {
@@ -648,9 +673,11 @@ html {
   position: absolute;
   bottom: 10px;
   right: 10px;
+  z-index: 99;
 }
 @media (max-width: 36em) {
-  .app__affix-footer {
-    display: none;
+  .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item,
+  .ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-submenu {
+    padding: 0 10px;
   }
 }
