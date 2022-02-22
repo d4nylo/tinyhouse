@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useMutation } from "@apollo/client";
 import { BankOutlined, HomeOutlined, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { useMutation } from "@apollo/client";
 import { Button, Form, Input, InputNumber, Layout, Radio, Typography, Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { ListingType } from "../../lib/graphql/globalTypes";
@@ -10,6 +10,7 @@ import {
   HostListing as HostListingData,
   HostListingVariables,
 } from "../../lib/graphql/mutations/HostListing/__generated__/HostListing";
+import { useScrollToTop } from "../../lib/hooks";
 import { Viewer } from "../../lib/types";
 import { displayErrorMessage, displaySuccessNotification, iconColor } from "../../lib/utils";
 
@@ -37,6 +38,8 @@ export const Host = ({ viewer }: Props) => {
       displayErrorMessage("Sorry! We weren't able to create your listing. Please try again later.");
     },
   });
+
+  useScrollToTop();
 
   if (!viewer.id || !viewer.hasWallet) {
     return (

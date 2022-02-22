@@ -3,39 +3,40 @@ import { Navigate } from "react-router-dom";
 import { useApolloClient, useMutation } from "@apollo/client";
 import { Card, Layout, Spin, Typography } from "antd";
 import { ErrorBanner } from "../../lib/components";
-import { AUTH_URL } from "../../lib/graphql/queries/AuthUrl";
 import { LOG_IN } from "../../lib/graphql/mutations/LogIn";
+import { LogIn as LogInData, LogInVariables } from "../../lib/graphql/mutations/LogIn/__generated__/LogIn";
+import { AUTH_URL } from "../../lib/graphql/queries/AuthUrl";
 import { AuthUrl as AuthUrlData } from "../../lib/graphql/queries/AuthUrl/__generated__/AuthUrl";
-import {
-  LogIn as LogInData,
-  LogInVariables,
-} from "../../lib/graphql/mutations/LogIn/__generated__/LogIn";
+import { useScrollToTop } from "../../lib/hooks";
 import { Viewer } from "../../lib/types";
 import { displayErrorMessage, displaySuccessNotification } from "../../lib/utils";
+
 import googleLogo from "./assets/google_logo.jpeg";
+
+const { Content } = Layout;
+const { Text, Title } = Typography;
 
 interface Props {
   setViewer: (viewer: Viewer) => void;
 }
 
-const { Content } = Layout;
-const { Text, Title } = Typography;
-
 export const Login = ({ setViewer }: Props) => {
   const client = useApolloClient();
 
-  const [logIn, { data: logInData, loading: logInLoading, error: logInError }] = useMutation<
-    LogInData,
-    LogInVariables
-  >(LOG_IN, {
-    onCompleted: (data) => {
-      if (data && data.logIn && data.logIn.token) {
-        setViewer(data.logIn);
-        sessionStorage.setItem("token", data.logIn.token);
-        displaySuccessNotification("You've successfully logged in!");
-      }
-    },
-  });
+  const [logIn, { data: logInData, loading: logInLoading, error: logInError }] = useMutation<LogInData, LogInVariables>(
+    LOG_IN,
+    {
+      onCompleted: (data) => {
+        if (data && data.logIn && data.logIn.token) {
+          setViewer(data.logIn);
+          sessionStorage.setItem("token", data.logIn.token);
+          displaySuccessNotification("You've successfully logged in!");
+        }
+      },
+    }
+  );
+
+  useScrollToTop();
 
   const logInRef = useRef(logIn);
 
@@ -97,8 +98,7 @@ export const Login = ({ setViewer }: Props) => {
           <span className="log-in-card__google-button-text">Sign in with Google</span>
         </button>
         <Text type="secondary">
-          Note: By signing in, you'll be redirected to the Google consent form to sign in with your
-          Google account.
+          Note: By signing in, you'll be redirected to the Google consent form to sign in with your Google account.
         </Text>
       </Card>
     </Content>

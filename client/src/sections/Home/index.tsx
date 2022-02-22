@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Row, Layout, Typography } from "antd";
 import { useQuery } from "@apollo/client";
+import { Col, Layout, Row, Typography } from "antd";
+import { ListingsFilter } from "../../lib/graphql/globalTypes";
 import { LISTINGS } from "../../lib/graphql/queries";
 import { Listings as ListingsData, ListingsVariables } from "../../lib/graphql/queries/Listings/__generated__/Listings";
-import { ListingsFilter } from "../../lib/graphql/globalTypes";
+import { useScrollToTop } from "../../lib/hooks";
 import { displayErrorMessage } from "../../lib/utils";
 import { HomeHero, HomeListings, HomeListingsSkeleton } from "./components";
 
@@ -25,6 +26,8 @@ export const Home = () => {
       page: PAGE_NUMBER,
     },
   });
+
+  useScrollToTop();
 
   const renderListingsSection = () => {
     if (loading) {

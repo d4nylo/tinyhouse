@@ -5,6 +5,7 @@ import { Col, Layout, Row } from "antd";
 import { ErrorBanner, PageSkeleton } from "../../lib/components";
 import { USER } from "../../lib/graphql/queries";
 import { User as UserData, UserVariables } from "../../lib/graphql/queries/User/__generated__/User";
+import { useScrollToTop } from "../../lib/hooks";
 import { Viewer } from "../../lib/types";
 import { UserBookings, UserListings, UserProfile } from "./components";
 
@@ -31,6 +32,8 @@ export const User = ({ viewer, setViewer }: Props) => {
       limit: PAGE_LIMIT,
     },
   });
+
+  useScrollToTop();
 
   if (loading) {
     return (

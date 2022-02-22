@@ -6,8 +6,9 @@ import { Moment } from "moment";
 import { ErrorBanner, PageSkeleton } from "../../lib/components";
 import { LISTING } from "../../lib/graphql/queries";
 import { Listing as ListingData, ListingVariables } from "../../lib/graphql/queries/Listing/__generated__/Listing";
-import { ListingCreateBooking, ListingBookings, ListingDetails, ListingCreateBookingModal } from "./components";
+import { useScrollToTop } from "../../lib/hooks";
 import { Viewer } from "../../lib/types";
+import { ListingBookings, ListingCreateBooking, ListingCreateBookingModal, ListingDetails } from "./components";
 
 const { Content } = Layout;
 
@@ -32,6 +33,8 @@ export const Listing = ({ viewer }: Props) => {
       limit: PAGE_LIMIT,
     },
   });
+
+  useScrollToTop();
 
   const handleListingRefetch = async () => {
     await refetch();

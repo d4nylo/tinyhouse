@@ -7,15 +7,16 @@ import {
   ConnectStripe as ConnectStripeData,
   ConnectStripeVariables,
 } from "../../lib/graphql/mutations/ConnectStripe/__generated__/ConnectStripe";
-import { displaySuccessNotification } from "../../lib/utils";
+import { useScrollToTop } from "../../lib/hooks";
 import { Viewer } from "../../lib/types";
+import { displaySuccessNotification } from "../../lib/utils";
+
+const { Content } = Layout;
 
 interface Props {
   viewer: Viewer;
   setViewer: (viewer: Viewer) => void;
 }
-
-const { Content } = Layout;
 
 export const Stripe = ({ viewer, setViewer }: Props) => {
   let navigate = useNavigate();
@@ -36,6 +37,8 @@ export const Stripe = ({ viewer, setViewer }: Props) => {
   );
 
   const connectStripeRef = useRef(connectStripe);
+
+  useScrollToTop();
 
   useEffect(() => {
     const code = new URL(window.location.href).searchParams.get("code");

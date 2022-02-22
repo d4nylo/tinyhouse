@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { Affix, Layout, List, Typography } from "antd";
 import { ErrorBanner, ListingCard } from "../../lib/components";
+import { ListingsFilter } from "../../lib/graphql/globalTypes";
 import { LISTINGS } from "../../lib/graphql/queries";
 import { Listings as ListingsData, ListingsVariables } from "../../lib/graphql/queries/Listings/__generated__/Listings";
-import { ListingsFilter } from "../../lib/graphql/globalTypes";
+import { useScrollToTop } from "../../lib/hooks";
 import { ListingsFilters, ListingsPagination, ListingsSkeleton } from "./components";
 
 const { Content } = Layout;
@@ -29,6 +30,8 @@ export const Listings = () => {
       page: page,
     },
   });
+
+  useScrollToTop();
 
   useEffect(() => {
     setPage(1);
