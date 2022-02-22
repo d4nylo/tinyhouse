@@ -31,6 +31,7 @@ export const User = ({ viewer, setViewer }: Props) => {
       listingsPage,
       limit: PAGE_LIMIT,
     },
+    fetchPolicy: "cache-and-network",
   });
 
   useScrollToTop();
