@@ -101,12 +101,11 @@ export const listingResolvers: IResolvers = {
           cursor = cursor.sort({ price: -1 });
         }
 
-        data.total = await cursor.count();
-
         cursor = cursor.skip(page > 0 ? (page - 1) * limit : 0);
         cursor = cursor.limit(limit);
 
         data.result = await cursor.toArray();
+        data.total = data.result.length;
 
         return data;
       } catch (error) {
@@ -204,8 +203,8 @@ export const listingResolvers: IResolvers = {
         cursor = cursor.skip(page > 0 ? (page - 1) * limit : 0);
         cursor = cursor.limit(limit);
 
-        data.total = await cursor.count();
         data.result = await cursor.toArray();
+        data.total = data.result.length;
 
         return data;
       } catch (error) {
