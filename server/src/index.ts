@@ -17,8 +17,10 @@ const mount = async (app: Application) => {
 
   app.use(compression());
 
-  app.use(express.static(`${__dirname}/client`));
-  app.get("/*", (_req, res) => res.send(`${__dirname}/client/index.html`));
+  if (!(process.env.NODE_END === "development")) {
+    app.use(express.static(`${__dirname}/client`));
+    app.get("/*", (_req, res) => res.send(`${__dirname}/client/index.html`));
+  }
 
   const server = new ApolloServer({
     typeDefs,
