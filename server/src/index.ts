@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import { ApolloServer } from "apollo-server-express";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { connectDatabase } from "./database";
 import { typeDefs, resolvers } from "./graphql";
 
@@ -15,22 +14,21 @@ const mount = async (app: Application) => {
 
   app.use(cookieParser(process.env.SECRET));
 
-  if (process.env.NODE_END === "production") {
-    app.use(compression());
-    app.use(express.static(`${__dirname}/client`));
-    app.get("/*", (_req, res) => res.send(`${__dirname}/client/index.html`));
-  }
+  app.use(compression());
+
+  // # for deployment purposes only
+  //app.use(express.static(`${__dirname}/client`));
+  //app.get("/*", (_req, res) => res.sendFile(`${__dirname}/client/index.html`));
 
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    plugins: process.env.NODE_END === "production" ? [ApolloServerPluginLandingPageGraphQLPlayground] : [],
     context: ({ req, res }) => ({ db, req, res }),
   });
 
-  server.start().then(() => {
-    server.applyMiddleware({ app, path: "/api" });
-  });
+  await server.start();
+
+  server.applyMiddleware({ app, path: "/api" });
 
   app.listen(process.env.PORT);
 

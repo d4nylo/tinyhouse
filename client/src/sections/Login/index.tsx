@@ -71,7 +71,7 @@ export const Login = ({ setViewer }: Props) => {
 
   if (logInData && logInData.logIn) {
     const { id: viewerId } = logInData.logIn;
-    return <Navigate to={`/user/${viewerId}`} />;
+    return <Navigate replace to={`/user/${viewerId}`} />;
   }
 
   const logInErrorBannerElement = logInError ? (
