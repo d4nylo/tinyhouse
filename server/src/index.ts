@@ -15,9 +15,8 @@ const mount = async (app: Application) => {
 
   app.use(cookieParser(process.env.SECRET));
 
-  app.use(compression());
-
-  if (!(process.env.NODE_END === "development")) {
+  if (process.env.NODE_END === "production") {
+    app.use(compression());
     app.use(express.static(`${__dirname}/client`));
     app.get("/*", (_req, res) => res.send(`${__dirname}/client/index.html`));
   }
@@ -25,7 +24,7 @@ const mount = async (app: Application) => {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+    plugins: process.env.NODE_END === "production" ? [ApolloServerPluginLandingPageGraphQLPlayground] : [],
     context: ({ req, res }) => ({ db, req, res }),
   });
 

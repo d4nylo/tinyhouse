@@ -11,7 +11,7 @@ const cookieOptions = {
   httpOnly: true,
   sameSite: true,
   signed: true,
-  secure: !(process.env.NODE_END === "development"),
+  secure: process.env.NODE_END === "production",
 };
 
 const logInViaGoogle = async (code: string, token: string, db: Database, res: Response): Promise<User | null> => {
