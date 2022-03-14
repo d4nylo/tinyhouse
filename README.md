@@ -1,4 +1,4 @@
-## TinyHouse 🏠
+# TinyHouse 🏠
 
 A Full-stack Typescript React & GraphQL application.
 
@@ -7,6 +7,19 @@ This app was made by following the [TinyHouse: A Fullstack React Masterclass wit
 You can check the app here: https://tinyhouse-dk.herokuapp.com
 
 ![App Screenshot](https://i.imgur.com/JzS8yfM.png)
+
+## Features
+
+Here is a summary of all the main features of the TinyHouse application. A user will be able to:
+
+- Sign-in with their Google account information.
+- Search for listings in various different locations in the world.
+- See specific details about listings.
+- Book listings for a period of time.
+- Connect their Stripe account to be allowed to create listings (i.e. be a host in TinyHouse) and receive payments from other users.
+- Create (i.e. host) listings of their own.
+- See a history of the listings they've created, the bookings they've made, and the bookings made to their own listings.
+- See a history of listings created by other users.
 
 ## Client
 
