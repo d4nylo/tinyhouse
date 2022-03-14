@@ -43,9 +43,7 @@ REACT_APP_S_PUBLISHABLE_KEY
 
 ### Environment Variables
 
-To run the server, you will need to add the following environment variables to your `.env` file at the root of the `/server` directory
-
-####
+To run the server, you will need to add the following environment variables to your `.env` file at the root of the `/server` directory.
 
 ```
 # General
@@ -73,3 +71,9 @@ CLOUDINARY_NAME
 CLOUDINARY_KEY
 CLOUDINARY_SECRET
 ```
+
+---
+
+## This file is under construction 👷‍♂️ 🏗 🚜 🚧
+
+![Under Construction](https://c.tenor.com/FtGd7MNyIqkAAAAd/construction-crane.gif)
