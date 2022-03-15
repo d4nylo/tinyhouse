@@ -29,7 +29,7 @@ export const AppHeader = ({ viewer, setViewer }: Props) => {
 
       if (pathnameSubStrings.length === 3) {
         // Ex.: "san%20francisco" => "san francisco"
-        const fixedLocationString = pathnameSubStrings[2].replace("%20", " ");
+        const fixedLocationString = decodeURIComponent(pathnameSubStrings[2]);
 
         setSearch(fixedLocationString);
         return;
