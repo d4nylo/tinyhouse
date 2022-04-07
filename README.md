@@ -25,6 +25,20 @@ Here is a summary of all the main features of the TinyHouse application. A user 
 
 ---
 
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/d4nylo/tinyhouse.git
+```
+
+Go to the project directory
+
+```bash
+  cd tinyhouse
+```
+
 ## Client
 
 ### Environment Variables
@@ -35,6 +49,24 @@ To run the client, you will need to add the following environment variables to y
 # Stripe
 REACT_APP_S_CLIENT_ID
 REACT_APP_S_PUBLISHABLE_KEY
+```
+
+Go to the client directory
+
+```bash
+  cd client
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm run start
 ```
 
 ---
@@ -70,6 +102,24 @@ S_SECRET_KEY
 CLOUDINARY_NAME
 CLOUDINARY_KEY
 CLOUDINARY_SECRET
+```
+
+Go to the server directory
+
+```bash
+  cd server
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm run start
 ```
 
 ---
